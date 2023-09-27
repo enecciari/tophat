@@ -20,32 +20,19 @@
 
 /* exported init, enable, disable */
 
+
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import * as Cpu from './lib/cpu.js';
+import * as Mem from './lib/mem.js';
+import * as Net from './lib/net.js';
+import * as FS from './lib/fs.js';
+import * as Config from './lib/config.js';
+import * as Container from './lib/container.js';
+import * as Problem from './lib/problem.js';
+
 let depFailures = [];
 let missingLibs = [];
-
-const Main = imports.ui.main;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-let GTop = null;
-let Cpu = null;
-let Mem = null;
-let Net = null;
-let FS = null;
-try {
-    // eslint-disable-next-line no-unused-vars
-    GTop = imports.gi.GTop;
-    Cpu = Me.imports.lib.cpu;
-    Mem = Me.imports.lib.mem;
-    Net = Me.imports.lib.net;
-    FS = Me.imports.lib.fs;
-} catch (err) {
-    log(`[${Me.metadata.name}] Error loading dependencies: ${err}`);
-    depFailures.push(err);
-    missingLibs.push('GTop');
-}
-const Config = Me.imports.lib.config;
-const Container = Me.imports.lib.container;
-const _ = Config.Domain.gettext;
 
 const MenuPosition = {
     LEFT_EDGE: 0,
@@ -60,8 +47,8 @@ const MenuPosition = {
 let tophat = null;
 
 class TopHat {
-    constructor() {
-        this.configHandler = new Config.ConfigHandler();
+    constructor(settings, metadata) {
+        this.configHandler = new Config.ConfigHandler(settings, metadata);
         this.container = new Container.TopHatContainer();
         this.cpu = new Cpu.CpuMonitor(this.configHandler);
         this.mem = new Mem.MemMonitor(this.configHandler);
@@ -72,7 +59,6 @@ class TopHat {
         this.container.addMonitor(this.fs);
         this.container.addMonitor(this.net);
         this.configHandler.connect_void('position-in-panel', () => {
-            this.moveWithinPanel();
         });
     }
 
@@ -131,34 +117,39 @@ class TopHat {
     }
 }
 
-function init() {
-    ExtensionUtils.initTranslations();
-}
-
-function enable() {
-    // log(`[${Me.metadata.name}] enabling version ${Me.metadata.version}`);
-
-    if (depFailures.length > 0) {
-        log(`[${Me.metadata.name}] missing dependencies, showing problem reporter instead`);
-        const Problem = Me.imports.lib.problem;
-        tophat = new Problem.TopHatProblemReporter();
-
-        let msg = _(`It looks like your computer is missing GIRepository (gir) bindings for the following libraries: ${missingLibs.join(', ')}\n\nAfter installing them, you'll need to restart your computer.`);
-        tophat.setMessage(msg);
-        tophat.setDetails(depFailures.join('\n'));
-
-        Main.panel.addToStatusArea(`${Me.metadata.name} Problem Reporter`, tophat);
-    } else {
-        tophat = new TopHat();
-        tophat.addToPanel();
+export default class TopHatExt extends Extension
+{
+    constructor(metadata) {
+        super(metadata);
+        this.metadata = metadata;
+        this.settings = this.getSettings();
+        this.initTranslations();
     }
 
-    // log(`[${Me.metadata.name}] enabled`);
-}
+    enable() {
+        // log(`[${Me.metadata.name}] enabling version ${Me.metadata.version}`);
 
-function disable() {
-    if (tophat !== null) {
-        tophat.destroy();
-        tophat = null;
+        if (depFailures.length > 0) {
+            log(`[${this.metadata.name}] missing dependencies, showing problem reporter instead`);
+            tophat = new Problem.TopHatProblemReporter(this.metadata);
+
+            let msg = _(`It looks like your computer is missing GIRepository (gir) bindings for the following libraries: ${missingLibs.join(', ')}\n\nAfter installing them, you'll need to restart your computer.`);
+            tophat.setMessage(msg);
+            tophat.setDetails(depFailures.join('\n'));
+
+            Main.panel.addToStatusArea(`${this.metadata.name} Problem Reporter`, tophat);
+        } else {
+            tophat = new TopHat(this.settings, this.metadata);
+            tophat.addToPanel();
+        }
+
+        // log(`[${Me.metadata.name}] enabled`);
+    }
+
+    disable() {
+        if (tophat !== null) {
+            tophat.destroy();
+            tophat = null;
+        }
     }
 }

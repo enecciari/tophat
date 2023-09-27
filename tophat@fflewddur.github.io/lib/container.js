@@ -19,14 +19,11 @@
 
 /* exported TopHatContainer */
 
-const {GObject, St} = imports.gi;
-const PanelMenu = imports.ui.panelMenu;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Config = Me.imports.lib.config;
-const _ = Config.Domain.gettext;
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
-var TopHatContainer = GObject.registerClass(
+export var TopHatContainer = GObject.registerClass(
 class TopHatContainer extends PanelMenu.Button {
     _init(menuAlignment, nameText, dontCreateMenu) {
         super._init({

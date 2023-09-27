@@ -32,17 +32,12 @@ var HISTORY_MAX_SIZE = 300; // The time-series graphs will show data for this ma
 
 var N_TOP_PROCESSES = 6;
 
-const Gettext = imports.gettext;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-var Domain = Gettext.domain(Me.metadata.uuid);
-
-var ConfigHandler = class ConfigHandler {
-    constructor() {
+export var ConfigHandler = class ConfigHandler {
+    constructor(settings, metadata) {
         this.signal_ids = [];
-        this._settings = ExtensionUtils.getSettings();
+        this._settings = settings;
         this._partitions = null;
+        this.metadata = metadata;
     }
 
     setPartitions(parts) {

@@ -20,21 +20,24 @@
 /* global global */
 /* exported TopHatMonitor, Meter */
 
-const {Atk, Clutter, GLib, GObject, Shell, St} = imports.gi;
-const PopupMenu = imports.ui.popupMenu;
-const Main = imports.ui.main;
-const ExtensionUtils = imports.misc.extensionUtils;
-const ShellConfig = imports.misc.config;
-const Util = imports.misc.util;
-const Me = ExtensionUtils.getCurrentExtension();
-const Config = Me.imports.lib.config;
-const _ = Config.Domain.gettext;
+
+import St from 'gi://St';
+import Atk from 'gi://Atk';
+import Shell from 'gi://Shell';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import Clutter from 'gi://Clutter';
+import * as ShellConfig from 'resource:///org/gnome/shell/misc/config.js';
+import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import * as Util from 'resource:///org/gnome/shell/misc/util.js';
+
 const MENU_COLUMNS = 2;
 const ANIMATION_DURATION = 500;
 
 // Re-implement GNOME Shell's PanelMenuButton class, with minor changes to
 // support adding it to a container
-var TopHatMonitor = GObject.registerClass({
+export var TopHatMonitor = GObject.registerClass({
     Properties: {
         'meter-bar-width': GObject.ParamSpec.double(
             'meter-bar-width',
@@ -584,7 +587,7 @@ if (shellMajor === 3 && shellMinor <= 36) {
     TopHatMonitor = TopHatMonitorLegacy;
 }
 
-var Meter = GObject.registerClass({
+export var Meter = GObject.registerClass({
 }, class TopHatMeter extends St.BoxLayout {
     _init(numBars = 1, width) {
         super._init({style_class: 'tophat-meter', y_align: Clutter.ActorAlign.CENTER, y_expand: true});
@@ -684,4 +687,4 @@ var Meter = GObject.registerClass({
         }
         super.destroy();
     }
-});
+}); 

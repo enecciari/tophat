@@ -1,10 +1,7 @@
 // Based upon https://github.com/corecoding/Vitals/blob/master/helpers/file.js
 
-const GLib = imports.gi.GLib;
-const Gio = imports.gi.Gio;
-const Me = imports.misc.extensionUtils.getCurrentExtension();
-// Me.imports.helpers.polyfills;
-const ByteArray = imports.byteArray;
+import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 
 var Decoder;
 try {
@@ -24,7 +21,7 @@ function convertUint8ArrayToString(contents) {
     return ByteArray.toString(contents).trim();
 }
 
-function File(path) {
+export function File(path) {
     if (path.indexOf('https://') === -1) {
         this.file = Gio.File.new_for_path(path);
     } else {

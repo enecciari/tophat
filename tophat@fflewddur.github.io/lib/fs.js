@@ -19,14 +19,15 @@
 
 /* exported FileSystemMonitor */
 
-const {Clutter, Gio, GLib, GObject, GTop, St} = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Config = Me.imports.lib.config;
-const Shared = Me.imports.lib.shared;
-const Monitor = Me.imports.lib.monitor;
-const _ = Config.Domain.gettext;
-const ngettext = Config.Domain.ngettext;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import GTop from 'gi://GTop';
+import * as Config from './config.js';
+import * as Shared from './shared.js';
+import * as Monitor from './monitor.js';
 
 class DiskActivity {
     constructor(read = 0, write = 0) {
@@ -95,7 +96,7 @@ class FSUsage {
     }
 }
 
-var FileSystemMonitor = GObject.registerClass({
+export var FileSystemMonitor = GObject.registerClass({
     Properties: {
         'mount': GObject.ParamSpec.string(
             'mount',
@@ -114,9 +115,9 @@ var FileSystemMonitor = GObject.registerClass({
     },
 }, class TopHatFileSystemMonitor extends Monitor.TopHatMonitor {
     _init(configHandler) {
-        super._init(`${Me.metadata.name} FS Monitor`);
+        super._init(`${configHandler.metadata.name} FS Monitor`);
 
-        let gicon = Gio.icon_new_for_string(`${Me.path}/icons/disk-icon-symbolic.svg`);
+        let gicon = Gio.icon_new_for_string(`${configHandler.metadata.path}/icons/disk-icon-symbolic.svg`);
         this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon'});
         this.add_child(this.icon);
 

@@ -19,20 +19,16 @@
 
 /* exported MemMonitor */
 
-const Gio = imports.gi.Gio;
-const GLib = imports.gi.GLib;
-const GObject = imports.gi.GObject;
-const GTop = imports.gi.GTop;
-const Clutter = imports.gi.Clutter;
-const St = imports.gi.St;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Config = Me.imports.lib.config;
-const Shared = Me.imports.lib.shared;
-const Monitor = Me.imports.lib.monitor;
-const FileModule = Me.imports.lib.file;
-const _ = Config.Domain.gettext;
-const ngettext = Config.Domain.ngettext;
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
+import St from 'gi://St';
+import Clutter from 'gi://Clutter';
+import GTop from 'gi://GTop';
+import * as Config from './config.js';
+import * as Shared from './shared.js';
+import * as Monitor from './monitor.js';
+import * as FileModule from './file.js';
 
 const KB_PER_GB = 1000000; // https://en.wikipedia.org/wiki/Gigabyte
 
@@ -138,10 +134,10 @@ class ProcessMemUse {
     }
 }
 
-var MemMonitor = GObject.registerClass(
+export var MemMonitor = GObject.registerClass(
     class TopHatMemMonitor extends Monitor.TopHatMonitor {
         _init(configHandler) {
-            super._init(`${Me.metadata.name} Memory Monitor`);
+            super._init(`${configHandler.metadata.name} Memory Monitor`);
 
             // Initialize libgtop values
             this.mem = new GTop.glibtop_mem();
@@ -154,7 +150,7 @@ var MemMonitor = GObject.registerClass(
             this.refreshChartsTimer = 0;
             this.refreshProcessesTimer = 0;
 
-            let gicon = Gio.icon_new_for_string(`${Me.path}/icons/mem-icon-symbolic.svg`);
+            let gicon = Gio.icon_new_for_string(`${configHandler.path}/icons/mem-icon-symbolic.svg`);
             this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon'});
             this.add_child(this.icon);
 

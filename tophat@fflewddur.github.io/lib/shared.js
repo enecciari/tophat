@@ -21,12 +21,11 @@
 /* exported getProcessList, getProcessName, bytesToHumanString, getPartitions */
 /* exported roundMax */
 
-const {Gio, GTop} = imports.gi;
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
+import Gio from 'gi://Gio';
+import GTop from 'gi://GTop';
 
-var SECOND_AS_MICROSECONDS = 1000000;
-var SECOND_AS_MILLISECONDS = 1000;
+export var SECOND_AS_MICROSECONDS = 1000000;
+export var SECOND_AS_MILLISECONDS = 1000;
 
 var TopProcess = class TopProcess {
     constructor(cmd, usage) {
@@ -35,7 +34,7 @@ var TopProcess = class TopProcess {
     }
 };
 
-function getProcessList() {
+export function getProcessList() {
     let extraInfo = new GTop.glibtop_proclist();
     let exclude = 0;
     var processes = GTop.glibtop_get_proclist(
@@ -48,7 +47,7 @@ function getProcessList() {
     }
 }
 
-function getProcessName(pid) {
+export function getProcessName(pid) {
     let argSize = new GTop.glibtop_proc_args();
     let args = GTop.glibtop_get_proc_args(argSize, pid, 0);
 
@@ -93,7 +92,7 @@ const TEN_TB_IN_B = 10000000000000;
 
 // Convert a number of bytes to a more logical human-readable string
 // (e.g., 1024 -> 1 K)
-function bytesToHumanString(bytes, unit = 'bytes', imprecise = false) {
+export function bytesToHumanString(bytes, unit = 'bytes', imprecise = false) {
     if (isNaN(bytes)) {
         return bytes;
     }
@@ -130,7 +129,7 @@ function bytesToHumanString(bytes, unit = 'bytes', imprecise = false) {
 }
 
 // Round up to the nearest power of 10 (or half that)
-function roundMax(val) {
+export function roundMax(val) {
     let result = Math.pow(10, Math.ceil(Math.log10(val)));
     if (result / 2 > val) {
         result /= 2;
@@ -139,7 +138,7 @@ function roundMax(val) {
 }
 
 // Returns an array of disk partition mount points
-function getPartitions() {
+export function getPartitions() {
     let mounts = [];
     let mountPoints = Gio.unix_mount_points_get();
     if (!mountPoints || !mountPoints[0]) {
