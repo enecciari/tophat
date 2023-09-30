@@ -59,6 +59,7 @@ class TopHat {
         this.container.addMonitor(this.fs);
         this.container.addMonitor(this.net);
         this.configHandler.connect_void('position-in-panel', () => {
+            this.moveWithinPanel();
         });
     }
 
@@ -121,13 +122,11 @@ export default class TopHatExt extends Extension
 {
     constructor(metadata) {
         super(metadata);
-        this.metadata = metadata;
-        this.settings = this.getSettings();
         this.initTranslations();
     }
 
     enable() {
-        // log(`[${Me.metadata.name}] enabling version ${Me.metadata.version}`);
+        log(`[${this.metadata.name}] enabling version ${this.metadata.version}`);
 
         if (depFailures.length > 0) {
             log(`[${this.metadata.name}] missing dependencies, showing problem reporter instead`);
@@ -139,11 +138,11 @@ export default class TopHatExt extends Extension
 
             Main.panel.addToStatusArea(`${this.metadata.name} Problem Reporter`, tophat);
         } else {
-            tophat = new TopHat(this.settings, this.metadata);
+            tophat = new TopHat(this.getSettings(), this.metadata);
             tophat.addToPanel();
         }
 
-        // log(`[${Me.metadata.name}] enabled`);
+        log(`[${this.metadata.name}] enabled`);
     }
 
     disable() {

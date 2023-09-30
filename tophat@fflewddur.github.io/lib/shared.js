@@ -27,7 +27,7 @@ import GTop from 'gi://GTop';
 export var SECOND_AS_MICROSECONDS = 1000000;
 export var SECOND_AS_MILLISECONDS = 1000;
 
-var TopProcess = class TopProcess {
+export var TopProcess = class TopProcess {
     constructor(cmd, usage) {
         this.cmd = cmd;
         this.usage = usage;
