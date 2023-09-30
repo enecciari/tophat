@@ -137,7 +137,8 @@ class ProcessMemUse {
 export var MemMonitor = GObject.registerClass(
     class TopHatMemMonitor extends Monitor.TopHatMonitor {
         _init(configHandler) {
-            super._init(`${configHandler.metadata.name} Memory Monitor`);
+            super._init(`${configHandler.metadata.name} Memory Monitor`,
+                configHandler.metadata.uuid);
 
             // Initialize libgtop values
             this.mem = new GTop.glibtop_mem();

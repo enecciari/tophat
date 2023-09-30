@@ -115,7 +115,8 @@ export var FileSystemMonitor = GObject.registerClass({
     },
 }, class TopHatFileSystemMonitor extends Monitor.TopHatMonitor {
     _init(configHandler) {
-        super._init(`${configHandler.metadata.name} FS Monitor`);
+        super._init(`${configHandler.metadata.name} FS Monitor`,
+             configHandler.metadata.uuid);
 
         let gicon = Gio.icon_new_for_string(`${configHandler.metadata.path}/icons/disk-icon-symbolic.svg`);
         this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon'});

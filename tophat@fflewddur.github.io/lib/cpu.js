@@ -91,7 +91,8 @@ export var CpuMonitor = GObject.registerClass({
     },
 }, class TopHatCpuMonitor extends Monitor.TopHatMonitor {
     _init(configHandler) {    
-        super._init(`${configHandler.metadata.name} CPU Monitor`);
+        super._init(`${configHandler.metadata.name} CPU Monitor`,
+             configHandler.metadata.uuid);
 
         // Initialize libgtop values
         this.cpuCores = GTop.glibtop_get_sysinfo().ncpu;

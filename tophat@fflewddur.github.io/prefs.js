@@ -19,21 +19,21 @@
 
 /* exported init, fillPreferencesWindow, buildPrefsWidget */
 
-const {Gdk, Gio, Gtk} = imports.gi;
+import {ExtensionPreferences, gettext as _} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+import Gtk from 'gi://Gtk';
+import Gio from 'gi://Gio';
+import Gdk from 'gi://Gdk';
 const gtkVersion = Gtk.get_major_version();
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const Shared = Me.imports.lib.shared;
-const Config = Me.imports.lib.config;
-const _ = Config.Domain.gettext;
+import * as Shared from './lib/shared.js';
+import * as Config from './lib/config.js';
 
-function init() {
-    ExtensionUtils.initTranslations();
-}
+export default class TopHatPreferences extends ExtensionPreferences
+{
+fillPreferencesWindow(window) {
+    this.initTranslations();
 
-function fillPreferencesWindow(window) {
     const Adw = imports.gi.Adw;
-    const configHandler = new Config.ConfigHandler();
+    const configHandler = new Config.ConfigHandler(this.getSettings(), this.metadata);
     let page = new Adw.PreferencesPage({title: 'General', icon_name: 'preferences-system-symbolic'});
     window.add(page);
 
@@ -46,68 +46,68 @@ function fillPreferencesWindow(window) {
     choices.append(_('Center'));
     choices.append(_('Right'));
     choices.append(_('Right edge'));
-    addComboRow(_('Position in panel'), choices, 'positionInPanel', group, configHandler);
+    this.addComboRow(_('Position in panel'), choices, 'positionInPanel', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Slow'));
     choices.append(_('Medium'));
     choices.append(_('Fast'));
-    addComboRow(_('Refresh speed'), choices, 'refreshRate', group, configHandler);
-    addColorRow(_('Meter color'), 'meterFGColor', group, configHandler);
-    addActionRow(_('Show icons beside monitors'), 'show-icons', group, configHandler);
-    addActionRow(_('Show animations'), 'show-animations', group, configHandler);
+    this.addComboRow(_('Refresh speed'), choices, 'refreshRate', group, configHandler);
+    this.addColorRow(_('Meter color'), 'meterFGColor', group, configHandler);
+    this.addActionRow(_('Show icons beside monitors'), 'show-icons', group, configHandler);
+    this.addActionRow(_('Show animations'), 'show-animations', group, configHandler);
 
     group = new Adw.PreferencesGroup({title: _('Processor')});
-    addActionRow(_('Show the CPU monitor'), 'show-cpu', group, configHandler);
+    this.addActionRow(_('Show the CPU monitor'), 'show-cpu', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Usage meter'));
     choices.append(_('Numeric value'));
     choices.append(_('Both meter and value'));
-    addComboRow(_('Show as'), choices, 'cpuDisplay', group, configHandler);
-    addActionRow(_('Show each core'), 'cpu-show-cores', group, configHandler);
+    this.addComboRow(_('Show as'), choices, 'cpuDisplay', group, configHandler);
+    this.addActionRow(_('Show each core'), 'cpu-show-cores', group, configHandler);
     page.add(group);
 
     group = new Adw.PreferencesGroup({title: _('Memory')});
-    addActionRow(_('Show the memory monitor'), 'show-mem', group, configHandler);
+    this.addActionRow(_('Show the memory monitor'), 'show-mem', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Usage meter'));
     choices.append(_('Numeric value'));
     choices.append(_('Both meter and value'));
-    addComboRow(_('Show as'), choices, 'memDisplay', group, configHandler);
+    this.addComboRow(_('Show as'), choices, 'memDisplay', group, configHandler);
     page.add(group);
 
     group = new Adw.PreferencesGroup({title: _('Disk')});
-    addActionRow(_('Show the disk monitor'), 'show-disk', group, configHandler);
+    this.addActionRow(_('Show the disk monitor'), 'show-disk', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Available storage'));
     choices.append(_('Disk activity'));
     choices.append(_('Storage and activity'));
-    addComboRow(_('Monitor shows'), choices, 'diskMonitorMode', group, configHandler);
+    this.addComboRow(_('Monitor shows'), choices, 'diskMonitorMode', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Usage meter'));
     choices.append(_('Numeric value'));
     choices.append(_('Both meter and value'));
-    addComboRow(_('Show available storage as'), choices, 'diskDisplay', group, configHandler);
+    this.addComboRow(_('Show available storage as'), choices, 'diskDisplay', group, configHandler);
     choices = new Gtk.StringList();
     let parts = Shared.getPartitions();
     parts.forEach(p => {
         choices.append(p);
     });
     configHandler.setPartitions(choices);
-    addComboRow(_('Filesystem to monitor'), choices, 'mountToMonitor', group, configHandler);
+    this.addComboRow(_('Filesystem to monitor'), choices, 'mountToMonitor', group, configHandler);
     page.add(group);
 
     group = new Adw.PreferencesGroup({title: _('Network')});
-    addActionRow(_('Show the network monitor'), 'show-net', group, configHandler);
+    this.addActionRow(_('Show the network monitor'), 'show-net', group, configHandler);
     choices = new Gtk.StringList();
     choices.append(_('Bytes'));
     choices.append(_('Bits'));
-    addComboRow(_('Measurement unit'), choices, 'networkUnit', group, configHandler);
+    this.addComboRow(_('Measurement unit'), choices, 'networkUnit', group, configHandler);
     page.add(group);
 
     window.set_default_size(400, 0);
 }
 
-function addActionRow(label, setting, group, configHandler) {
+addActionRow(label, setting, group, configHandler) {
     const Adw = imports.gi.Adw;
 
     const row = new Adw.ActionRow({title: label});
@@ -123,7 +123,7 @@ function addActionRow(label, setting, group, configHandler) {
     row.activatable_widget = toggle;
 }
 
-function addColorRow(label, setting, group, configHandler) {
+addColorRow(label, setting, group, configHandler) {
     const Adw = imports.gi.Adw;
 
     const row = new Adw.ActionRow({title: label});
@@ -141,7 +141,7 @@ function addColorRow(label, setting, group, configHandler) {
     row.activatable_widget = button;
 }
 
-function addComboRow(label, choices, setting, group, configHandler) {
+addComboRow(label, choices, setting, group, configHandler) {
     const Adw = imports.gi.Adw;
     let row = new Adw.ComboRow({title: label, model: choices, selected: configHandler[setting]});
 
@@ -154,7 +154,7 @@ function addComboRow(label, choices, setting, group, configHandler) {
 
 // GTK versions for backwards-compatibility
 
-function buildPrefsWidget() {
+buildPrefsWidget() {
     // log(`[TopHat] GtkVersion: ${gtkVersion}`);
     if (gtkVersion === 3) {
         return buildPrefsWidget3();
@@ -163,7 +163,7 @@ function buildPrefsWidget() {
     }
 }
 
-function buildPrefsWidget3() {
+buildPrefsWidget3() {
     const configHandler = new Config.ConfigHandler();
 
     let frame = new Gtk.Box({
@@ -268,7 +268,7 @@ function buildPrefsWidget3() {
     return frame;
 }
 
-function buildSwitch3(key, text, settings) {
+buildSwitch3(key, text, settings) {
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     let label = new Gtk.Label({label: text, xalign: 0});
     let toggle = new Gtk.Switch({active: settings.get_boolean(key)});
@@ -283,7 +283,7 @@ function buildSwitch3(key, text, settings) {
     return hbox;
 }
 
-function buildColorButton3(key, text, configHandler) {
+buildColorButton3(key, text, configHandler) {
     const hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     const label = new Gtk.Label({label: text, xalign: 0});
     const button = new Gtk.ColorButton();
@@ -300,7 +300,7 @@ function buildColorButton3(key, text, configHandler) {
     return hbox;
 }
 
-function buildDropDown3(key, text, choices, configHandler) {
+buildDropDown3(key, text, choices, configHandler) {
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     let label = new Gtk.Label({label: text, xalign: 0});
     let dropdown = new Gtk.ComboBoxText();
@@ -318,16 +318,16 @@ function buildDropDown3(key, text, choices, configHandler) {
     return hbox;
 }
 
-function buildHeader3(text) {
+buildHeader3(text) {
     const label = new Gtk.Label({label: text, xalign: 0});
     return label;
 }
 
-function addPref3(widget, frame) {
+addPref3(widget, frame) {
     frame.add(widget);
 }
 
-function buildPrefsWidget4() {
+buildPrefsWidget4() {
     const configHandler = new Config.ConfigHandler();
 
     let frame = new Gtk.Box({
@@ -431,7 +431,7 @@ function buildPrefsWidget4() {
     return frame;
 }
 
-function buildSwitch4(key, text, settings) {
+buildSwitch4(key, text, settings) {
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     let label = new Gtk.Label({label: text, xalign: 0, hexpand: 1});
     let toggle = new Gtk.Switch({active: settings.get_boolean(key)});
@@ -446,7 +446,7 @@ function buildSwitch4(key, text, settings) {
     return hbox;
 }
 
-function buildColorButton4(key, text, configHandler) {
+buildColorButton4(key, text, configHandler) {
     const hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     const label = new Gtk.Label({label: text, xalign: 0, hexpand: 1});
     const button = new Gtk.ColorButton();
@@ -463,7 +463,7 @@ function buildColorButton4(key, text, configHandler) {
     return hbox;
 }
 
-function buildDropDown4(key, text, choices, configHandler) {
+buildDropDown4(key, text, choices, configHandler) {
     let hbox = new Gtk.Box({orientation: Gtk.Orientation.HORIZONTAL, spacing: 12, margin_start: 12});
     let label = new Gtk.Label({label: text, xalign: 0, hexpand: 1});
     let dropdown = new Gtk.DropDown({model: choices});
@@ -478,11 +478,12 @@ function buildDropDown4(key, text, choices, configHandler) {
     return hbox;
 }
 
-function buildHeader4(text) {
+buildHeader4(text) {
     const label = new Gtk.Label({label: text, xalign: 0, hexpand: 1});
     return label;
 }
 
-function addPref4(widget, frame) {
+addPref6(widget, frame) {
     frame.append(widget);
+}
 }

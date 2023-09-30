@@ -78,7 +78,7 @@ export var TopHatMonitor = GObject.registerClass({
     },
     Signals: {'menu-set': {}},
 }, class TopHatMonitorBase extends St.Widget {
-    _init(name) {
+    _init(name, uuid) {
         super._init({
             reactive: true,
             can_focus: true,
@@ -91,6 +91,7 @@ export var TopHatMonitor = GObject.registerClass({
 
         });
         this.name = name;
+        this.uuid = uuid;
         this._delegate = this;
         this._signals = [];
 
@@ -191,7 +192,7 @@ export var TopHatMonitor = GObject.registerClass({
     }
 
     get role() {
-        return `${Me.metadata.name} ${this.name}`;
+        return `${this.name} `;
     }
 
     refresh() {
@@ -349,13 +350,9 @@ export var TopHatMonitor = GObject.registerClass({
         button.connect('clicked', () => {
             this.menu.close(true);
             try {
-                if (ExtensionUtils && ExtensionUtils.openPrefs) {
-                    ExtensionUtils.openPrefs();
-                } else {
-                    Util.spawn(['gnome-shell-extension-prefs', Me.metadata.uuid]);
-                }
+                Util.spawn(['gnome-shell-extension-prefs', this.uuid]);
             } catch (err) {
-                log(`[${Me.metadata.name}] Error opening settings: ${err}`);
+                log(`[${this.name}] Error opening settings: ${err}`);
             }
         });
         box.add_child(button);

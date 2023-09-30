@@ -47,7 +47,8 @@ export var NetMonitor = GObject.registerClass({
     },
 }, class TopHatNetMonitor extends Monitor.TopHatMonitor {
     _init(configHandler) {
-        super._init(`${configHandler.metadata.name} Network Monitor`);
+        super._init(`${configHandler.metadata.name} Network Monitor`,
+             configHandler.metadata.uuid);
 
         let gicon = Gio.icon_new_for_string(`${configHandler.metadata.path}/icons/net-icon-symbolic.svg`);
         this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon tophat-panel-icon-net'});
