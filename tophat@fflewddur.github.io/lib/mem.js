@@ -151,7 +151,7 @@ export var MemMonitor = GObject.registerClass(
             this.refreshChartsTimer = 0;
             this.refreshProcessesTimer = 0;
 
-            let gicon = Gio.icon_new_for_string(`${configHandler.path}/icons/mem-icon-symbolic.svg`);
+            let gicon = Gio.icon_new_for_string(`${configHandler.metadata.path}/icons/mem-icon-symbolic.svg`);
             this.icon = new St.Icon({gicon, style_class: 'system-status-icon tophat-panel-icon'});
             this.add_child(this.icon);
 
